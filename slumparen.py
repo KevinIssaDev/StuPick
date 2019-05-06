@@ -72,7 +72,6 @@ def random_student(class_list, multiple=False):
                 print("Slumpad elev " + str(x) + ": " + Fore.GREEN + picked_student)
             press = getch()
             if press != Keys.enter:
-                print("not enter")
                 break
     else:
         while True:
