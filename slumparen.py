@@ -38,18 +38,21 @@ def get_class(merging = False):
 
 def load_class(class_name, merging = False):
     global klass
+    valid = False
     try:
         with open(class_name + ".txt", "r") as class_file:
             class_list = class_file.readlines()
-        class_list = ['{} {[0]}'.format(*student.split()) for student in class_list]
+            class_list = ['{} {[0]}'.format(*student.split()) for student in class_list]
+            valid = True
+    except:
+        print(Fore.RED + "Klassen hittades inte, försök igen.")
+        class_list = get_class()
+    if valid:
         if not merging:
             klass = class_name
         else:
             klass = klass + Fore.RESET + " & " + Fore.GREEN + class_name
-        return class_list
-    except:
-        print(Fore.RED + "Klassen hittades inte, försök igen.")
-        class_list = get_class()
+    return class_list
 
 def random_student(class_list, multiple=False):
     if multiple:
@@ -59,19 +62,14 @@ def random_student(class_list, multiple=False):
         while True:
             picked_students = set()
             cls()
-            try:
-                for x in range(1, amount+1):
-                    unique = False
-                    while not unique:
-                        picked_student = choice(class_list)
-                        if picked_student not in picked_students:
-                            unique = True
-                        picked_students.add(picked_student)
-                    print("Slumpad elev " + str(x) + ": " + Fore.GREEN + picked_student)
-            except Exception as e:
-                log_crash(e)
-                getch()
-                return
+            for x in range(1, amount+1):
+                unique = False
+                while not unique:
+                    picked_student = choice(class_list)
+                    if picked_student not in picked_students:
+                        unique = True
+                    picked_students.add(picked_student)
+                print("Slumpad elev " + str(x) + ": " + Fore.GREEN + picked_student)
             press = getch()
             if press != Keys.enter:
                 print("not enter")
@@ -79,12 +77,7 @@ def random_student(class_list, multiple=False):
     else:
         while True:
             cls()
-            try:
-                print("Slumpad elev: " + Fore.GREEN +choice(class_list))
-            except Exception as e:
-                log_crash(e)
-                getch()
-                return
+            print("Slumpad elev: " + Fore.GREEN +choice(class_list))
             press = getch()
             if press != Keys.enter:
                 break
