@@ -1,17 +1,35 @@
 from os import system
 from random import choice
-import keyboard
+from msvcrt import getch
+from colorama import init, Fore
 
+init(autoreset=True)
 klass = None
-menu_list = "[1] - Slumpa elev\n[2] - Byt klass\n[3] - Lägg till klass\n"
+
+class Keys:
+    enter = b'\r'
+    esc = b'\x1b'
+    one = "1".encode()
+    two = "2".encode()
+    three = "3".encode()
+    four = "4".encode()
+    five = "5".encode()
+
+def log_crash(error):
+    with open("log.txt", "a") as f:
+        f.write(str(error))
+    print("Något gick fel, en crash-logg har skapats (log.txt). Visa Kevin Issa TE17!")
+    print("Du kan starta om programmet eller byta klass (till samma), då bör det funka.")
 
 def cls(all = False, menu = True):
     system('cls')
+    items = ["Slumpa en elev", "Slumpa flera elever", "Skapa grupper" ,"Byt klass", "Lägg till klass"]
     if not all:
-        print("Klass: " + klass.upper() + "\n")
+        print("Klass: " + Fore.YELLOW + klass.upper() + "\n")
     if menu:
-        print(menu_list)
-    #pass
+        for num, val in enumerate(items, 1):
+            print("{} - {}".format(num, val))
+        print()
 
 def get_class(merging = False):
     class_name = input("Klass: ")
@@ -24,15 +42,66 @@ def load_class(class_name, merging = False):
         with open(class_name + ".txt", "r") as class_file:
             class_list = class_file.readlines()
         class_list = ['{} {[0]}'.format(*student.split()) for student in class_list]
-        print(class_name + " loaded.")
         if not merging:
             klass = class_name
         else:
-            klass = klass + " & " + class_name
+            klass = klass + Fore.RESET + " & " + Fore.GREEN + class_name
         return class_list
     except:
-        print("Klassen hittades inte, försök igen.")
-        get_class()
+        print(Fore.RED + "Klassen hittades inte, försök igen.")
+        class_list = get_class()
+
+def random_student(class_list, multiple=False):
+    if multiple:
+        amount = get_int_input("Antal: ")
+        if amount > len(class_list):
+            amount = len(class_list)
+        while True:
+            picked_students = set()
+            cls()
+            try:
+                for x in range(1, amount+1):
+                    unique = False
+                    while not unique:
+                        picked_student = choice(class_list)
+                        if picked_student not in picked_students:
+                            unique = True
+                        picked_students.add(picked_student)
+                    print("Slumpad elev " + str(x) + ": " + Fore.GREEN + picked_student)
+            except Exception as e:
+                log_crash(e)
+                getch()
+                return
+            press = getch()
+            if press != Keys.enter:
+                print("not enter")
+                break
+    else:
+        while True:
+            cls()
+            try:
+                print("Slumpad elev: " + Fore.GREEN +choice(class_list))
+            except Exception as e:
+                log_crash(e)
+                getch()
+                return
+            press = getch()
+            if press != Keys.enter:
+                break
+
+def divide_chunks(l, n):
+    for i in range(0, len(l), n):
+        yield l[i:i + n]
+
+def create_groups(class_list):
+    size_per_group = get_int_input("Antal elever per grupp: ")
+    cls()
+    groups = list(divide_chunks(class_list, size_per_group))
+    print(Fore.YELLOW + "Grupper: {}\n".format(str(len(groups))))
+    for num, group in enumerate(groups, 1):
+        print("Grupp {}: ".format(num) + Fore.GREEN + ', '.join(group))
+    getch()
+
 
 def get_int_input(text):
     valid = False
@@ -42,49 +111,35 @@ def get_int_input(text):
             _input = int(_input)
             valid = True
         except:
-            print("Ogiltigt val, försök igen.")
+            print(Fore.RED + "Ogiltigt nummer, försök igen.")
     return _input
 
-def random_student(class_list):
-    cls()
-    try:
-        print("Slumpad elev: " + choice(class_list))
-    except Exception as e:
-        print("Något gick fel, försök igen.")
-    print("\nTryck enter för att fortsätta")
-    while True:
-        if keyboard.is_pressed('enter'):
-            pass
-
-def change_class():
-    cls(all = True, menu = False)
-    class_list = get_class()
+def merge_classes(class_list):
+    class_list += get_class(merging = True)
     return class_list
 
-keyboard.add_hotkey('2', change_class)
-
-def menu():
+def run():
+    cls(all = True, menu = False)
     class_list = get_class()
-    keyboard.add_hotkey('1', random_student, args=(class_list))
-    keyboard.add_hotkey('2', change_class)
-    keyboard.add_hotkey('3', print, args=('triggered', 'hotkey'))
     while True:
         cls()
-        while True:
-            if keyboard.is_pressed('1'):
+        option = getch()
+        try:
+            if option == Keys.one:
                 random_student(class_list)
-                break
-            if keyboard.is_pressed('2'):
-                cls(all = True, menu = False)
+            elif option == Keys.two:
+                random_student(class_list, multiple=True)
+            elif option == Keys.three:
+                create_groups(class_list)
+            elif option == Keys.four:
                 class_list = get_class()
-                break
-            if keyboard.is_pressed('3'):
-                cls()
-                class_list += get_class(merging = True)
+            elif option == Keys.five:
+                merge_classes(class_list)
+            elif option == Keys.esc:
+                 break
+            else:
+                pass
+        except:
+            log_crash()
 
-
-
-try:
-    menu()
-except KeyboardInterrupt:
-    pass
+run()
