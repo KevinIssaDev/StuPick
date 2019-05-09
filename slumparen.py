@@ -1,5 +1,5 @@
 from os import system
-from random import choice
+from random import choice, shuffle
 from msvcrt import getch
 from colorama import init, Fore
 
@@ -96,12 +96,16 @@ def divide_chunks(l, n):
 def create_groups(class_list):
     """ Aquires the size to split the class-list into and prints the groups """
     size_per_group = get_int_input("Antal elever per grupp: ")
-    cls()
-    groups = list(divide_chunks(class_list, size_per_group))
-    print(Fore.YELLOW + "Grupper: {}\n".format(str(len(groups))))
-    for num, group in enumerate(groups, 1):
-        print("Grupp {}: ".format(num) + Fore.GREEN + ', '.join(group))
-    getch()
+    while True:
+        cls()
+        shuffle(class_list)
+        groups = list(divide_chunks(class_list, size_per_group))
+        print(Fore.YELLOW + "Grupper: {}\n".format(str(len(groups))))
+        for num, group in enumerate(groups, 1):
+            print("Grupp {}: ".format(num) + Fore.GREEN + ', '.join(group))
+        press = getch()
+        if press != Keys.enter:
+            break
 
 
 def get_int_input(text):
@@ -143,7 +147,7 @@ def run():
                  break
             else:
                 pass
-        except:
-            log_crash()
+        except Exception as e:
+            log_crash(e)
 
 run()
