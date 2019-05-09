@@ -16,12 +16,16 @@ class Keys:
     five = "5".encode()
 
 def log_crash(error):
+    """ Logs crashes to log-file """
     with open("log.txt", "a") as f:
         f.write(str(error))
     print("Något gick fel, en crash-logg har skapats (log.txt). Visa Kevin Issa TE17!")
     print("Du kan starta om programmet eller byta klass (till samma), då bör det funka.")
 
 def cls(all = False, menu = True):
+    """ Clears the console (Windows only, use 'clear' for UNIX/Linux)
+
+    Creates the menu list and prints the currently loaded class """
     system('cls')
     items = ["Slumpa en elev", "Slumpa flera elever", "Skapa grupper\n" ,"Byt klass", "Lägg till klass"]
     if not all:
@@ -32,11 +36,13 @@ def cls(all = False, menu = True):
         print()
 
 def get_class(merging = False):
+    """ Aquires the class's name (filename without extension) from user-input"""
     class_name = input("Klass: ")
     class_list = load_class(class_name, merging = merging)
     return class_list
 
 def load_class(class_name, merging = False):
+    """ Loads and parses the class-list file """
     global klass
     valid = False
     try:
@@ -55,6 +61,7 @@ def load_class(class_name, merging = False):
     return class_list
 
 def random_student(class_list, multiple=False):
+    """ Prints one or multiple random students """
     if multiple:
         amount = get_int_input("Antal: ")
         if amount > len(class_list):
@@ -82,10 +89,12 @@ def random_student(class_list, multiple=False):
                 break
 
 def divide_chunks(l, n):
+    """ Divides the loaded class-list into chunks of specified size """
     for i in range(0, len(l), n):
         yield l[i:i + n]
 
 def create_groups(class_list):
+    """ Aquires the size to split the class-list into and prints the groups """
     size_per_group = get_int_input("Antal elever per grupp: ")
     cls()
     groups = list(divide_chunks(class_list, size_per_group))
@@ -96,6 +105,7 @@ def create_groups(class_list):
 
 
 def get_int_input(text):
+    """ To aquire a valid integer from input() """
     valid = False
     while not valid:
         _input = input(text)
@@ -107,10 +117,12 @@ def get_int_input(text):
     return _input
 
 def merge_classes(class_list):
+    """ To merge class-lists """
     class_list += get_class(merging = True)
     return class_list
 
 def run():
+    """ main() """
     cls(all = True, menu = False)
     class_list = get_class()
     while True:
