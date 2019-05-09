@@ -40,7 +40,7 @@ def load_class(class_name, merging = False):
     global klass
     valid = False
     try:
-        with open(class_name + ".txt", "r") as class_file:
+        with open(class_name + ".txt", "r", encoding='utf-8', errors='ignore') as class_file:
             class_list = class_file.readlines()
             class_list = ['{} {[0]}'.format(*student.split()) for student in class_list]
             valid = True
