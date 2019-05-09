@@ -23,7 +23,7 @@ def log_crash(error):
 
 def cls(all = False, menu = True):
     system('cls')
-    items = ["Slumpa en elev", "Slumpa flera elever", "Skapa grupper" ,"Byt klass", "Lägg till klass"]
+    items = ["Slumpa en elev", "Slumpa flera elever", "Skapa grupper\n" ,"Byt klass", "Lägg till klass"]
     if not all:
         print("Klass: " + Fore.YELLOW + klass.upper() + "\n")
     if menu:
